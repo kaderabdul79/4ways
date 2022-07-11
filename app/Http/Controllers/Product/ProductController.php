@@ -46,4 +46,24 @@ class ProductController extends Controller
             'products'=>$products,
         ]);
     }
+
+    // delete the product in specific the ID row
+    public function destroy($id){
+        $product = Product::find($id);
+        if($product)
+        {
+            $product->delete();
+            return response()->json([
+                'status'=>200,
+                'message'=>'product Deleted Successfully.'
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'status'=>404,
+                'message'=>'No product Found.'
+            ]);
+        }
+    }
 }
