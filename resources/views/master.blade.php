@@ -15,7 +15,7 @@
 </head>
 
 <body>
-  <main class="bg-primary">
+  <main class="bg-primary m-3">
     @yield('content')
   </main>
   <!-- Bootstrap JavaScript Libraries -->
