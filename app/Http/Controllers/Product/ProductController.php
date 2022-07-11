@@ -37,4 +37,13 @@ class ProductController extends Controller
             'message'=>'Product Added Successfully.'
         ]);
     }
+
+    // fetch all product from db
+    public function getAllProduct()
+    {
+        $products = Product::all();
+        return response()->json([
+            'products'=>$products,
+        ]);
+    }
 }

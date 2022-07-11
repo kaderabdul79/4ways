@@ -1,4 +1,5 @@
 @extends('master')
+
 @section('content')
 <div class="card">
     <div class="card-body">
@@ -16,29 +17,20 @@
                             <th scope="col">Id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Price</th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="">
-                            <td scope="row">1</td>
-                            <td>Walton</td>
-                            <td>
-                                <a href="" class="btn btn-primary">View Product</a>
-                                <a href="" class="btn btn-warning">Edit Product</a>
-                                <a href="" class="btn btn-danger">Delete Product</a>
-                            </td>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
-            
         </p>
     </div>
 </div>
-    {{--  --}}
+{{--  --}}
 
-  
-  <!-- Modal -->
+  <!-- AddProductModal -->
   <div class="modal fade" id="AddProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -86,6 +78,8 @@
     <script>
         $(document).ready(function () {
             // console.log("hello, I am working")
+
+            // insert/add product
             $('#add_product').on('click',function(e){
                 e.preventDefault();
                 let productData = {
@@ -116,11 +110,42 @@
                             $('#AddProductModal').find('input').val('');
                             $('#add_product').text('Saved');
                             $('#AddProductModal').modal('hide');
+                            // after added data fetch all product to get instant new inserted data in UI
+                            getAllProduct()
                         }
                         
                     }
                 });
             })
+
+            // getAllProduct
+            getAllProduct()
+
+            function getAllProduct(){
+                $.ajax({
+                    type: "GET",
+                    url: "/products",
+                    dataType: "json",
+                    success: function (response) {
+                        // before show data in UI, tbody should empty, otherwise data will repetitive
+                        $('tbody').html("");
+                        $.each(response.products, function (key, product) { 
+                            console.log(key, product);
+                            $('tbody').append('<tr class="">\
+                                <td scope="row">'+product.id+'</td>\
+                                <td>'+product.name+'</td>\
+                                <td>'+product.price+'</td>\
+                                <td>\
+                                    <a href="" value="' + product.id + '" class="btn btn-primary">View Product</a>\
+                                    <a href="" value="' + product.id + '" class="btn btn-warning">Edit Product</a>\
+                                    <a href="" value="' + product.id + '" class="btn btn-danger">Delete Product</a>\
+                                </td>\
+                             </tr>')
+                        });
+                        
+                    }
+                });
+            }
         });
     </script>
 @endsection
