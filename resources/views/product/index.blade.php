@@ -30,7 +30,7 @@
 </div>
 {{--  --}}
 
-  <!-- AddProductModal -->
+  <!-- Add Product Modal -->
   <div class="modal fade" id="AddProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -71,6 +71,28 @@
       </div>
     </div>
   </div>
+  {{-- End Add Product Modal --}}
+
+  {{-- Delete Product Modal --}}
+    <div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Product Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Confirm to Delete Data ?</h4>
+                    <input type="hidden" id="deleteing_product">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary delete_product">Yes Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{-- End Product Delete Modal --}}
   
 @endsection
 
@@ -130,22 +152,60 @@
                         // before show data in UI, tbody should empty, otherwise data will repetitive
                         $('tbody').html("");
                         $.each(response.products, function (key, product) { 
-                            console.log(key, product);
+                            // console.log(key, product);
                             $('tbody').append('<tr class="">\
                                 <td scope="row">'+product.id+'</td>\
                                 <td>'+product.name+'</td>\
                                 <td>'+product.price+'</td>\
                                 <td>\
-                                    <a href="" value="' + product.id + '" class="btn btn-primary">View Product</a>\
-                                    <a href="" value="' + product.id + '" class="btn btn-warning">Edit Product</a>\
-                                    <a href="" value="' + product.id + '" class="btn btn-danger">Delete Product</a>\
+                                    <button type="button" value="' + product.id + '" class="btn btn-primary editbtn">View Product</button>\
+                                    <button type="button" value="' + product.id + '" class="btn btn-primary editbtn">Edit Product</button>\
+                                    <button type="button" value="' + product.id + '" class="btn btn-danger deletebtn">Delete Product</button>\
                                 </td>\
                              </tr>')
                         });
-                        
                     }
                 });
             }
+            
+
+            // delete a specific Product
+            $(document).on('click', '.deletebtn', function (e) {
+                e.preventDefault();
+                var product_id = $('.deletebtn').val();
+                // console.log($(this).val());
+                $('#DeleteModal').modal('show');
+                $('#deleteing_product').val(product_id);
+            });
+
+            $(document).on('click', '.delete_product', function (e) {
+                e.preventDefault();
+
+                $(this).text('Deleting...');
+                var id = $('#deleteing_product').val();
+
+                $.ajax({
+                    type: "DELETE",
+                    url: "/products/" + id,
+                    dataType: "json",
+                    success: function (response) {
+                        // console.log(response);
+                        if (response.status == 404) {
+                            $('#success_message').addClass('alert alert-success');
+                            $('#success_message').text(response.message);
+                            $('.delete_product').text('Yes Delete');
+                        } else {
+                            $('#success_message').html("");
+                            $('#success_message').addClass('alert alert-success');
+                            $('#success_message').text(response.message);
+                            $('.delete_product').text('Yes Delete');
+                            $('#DeleteModal').modal('hide');
+                            getAllProduct()
+                        }
+                    }
+                });
+            });
+            // end product delete
         });
     </script>
 @endsection
