@@ -31,7 +31,7 @@
 {{--  --}}
 
   <!-- Add Product Modal -->
-  <div class="modal fade" id="AddProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal fade" id="AddProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="AddProductModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -72,6 +72,49 @@
     </div>
   </div>
   {{-- End Add Product Modal --}}
+
+  {{-- edit product modal --}}
+  <div class="modal fade" id="EditProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="EditProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="EditProductModalLabel">Edit Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {{-- showing message/response --}}
+            <ul class="list-unstyled" id="save_msgList"></ul>
+            {{-- productName --}}
+          <div class="mb-3">
+            <label for="" class="form-label">Name</label>
+            <input type="text"
+              class="form-control" name="name" id="editProductName" aria-describedby="helpId" placeholder="product name">
+          </div>
+          {{-- addProductDescription --}}
+          <div class="mb-3">
+            <label for="" class="form-label">Description</label>
+            <textarea class="form-control" name="description" id="editProductDescription" placeholder="product description" rows="3"></textarea>
+          </div>
+           {{-- productPrice--}}
+          <div class="mb-3">
+            <label for="" class="form-label">Price</label>
+            <input type="text"
+              class="form-control" name="price" id="editProductPrice" aria-describedby="helpId" placeholder="product price">
+          </div>
+           {{-- productQuantity--}}
+           <div class="mb-3">
+            <label for="" class="form-label">Quantity</label>
+            <input type="text"
+              class="form-control" name="quantity" id="editProductQuantity" aria-describedby="helpId" placeholder="product quantity">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="edit_product">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{-- end edit product modal --}}
 
   {{-- Delete Product Modal --}}
     <div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -158,7 +201,7 @@
                                 <td>'+product.name+'</td>\
                                 <td>'+product.price+'</td>\
                                 <td>\
-                                    <button type="button" value="' + product.id + '" class="btn btn-primary editbtn">View Product</button>\
+                                    <button type="button" value="' + product.id + '" class="btn btn-primary viewbtn">View Product</button>\
                                     <button type="button" value="' + product.id + '" class="btn btn-primary editbtn">Edit Product</button>\
                                     <button type="button" value="' + product.id + '" class="btn btn-danger deletebtn">Delete Product</button>\
                                 </td>\
@@ -167,6 +210,32 @@
                     }
                 });
             }
+
+            // edit a specific Product Information
+            $(document).on('click', '.editbtn', function (e) {
+                e.preventDefault();
+                var product_id = $('.editbtn').val();
+                $('#editProductModal').modal('show');
+                $.ajax({
+                    type: "GET",
+                    url: "/products/" + product_id,
+                    success: function (response) {
+                        if (response.status == 404) {
+                            $('#success_message').addClass('alert alert-success');
+                            $('#success_message').text(response.message);
+                            $('#editProductModal').modal('hide');
+                        } else {
+                            console.log(response.product);
+                            $('#editProductName').val(response.product.name);
+                            $('#editProductDescription').val(response.product.description);
+                            $('#editProductPrice').val(response.product.price);
+                            $('#editProductQuantity').val(response.product.quantity);
+                            $('#product_id').val(product_id);
+                        }
+                    }
+                });
+                $('.btn-close').find('input').val('');
+            })
             
 
             // delete a specific Product
@@ -200,12 +269,12 @@
                             $('#success_message').text(response.message);
                             $('.delete_product').text('Yes Delete');
                             $('#DeleteModal').modal('hide');
-                            getAllProduct()
+                            getAllProduct();
                         }
                     }
                 });
             });
-            // end product delete
+            // end product deleting
         });
     </script>
 @endsection

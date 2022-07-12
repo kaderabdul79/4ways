@@ -47,6 +47,26 @@ class ProductController extends Controller
         ]);
     }
 
+    // edit product Detail's
+    public function edit($id)
+    {
+        $product = Product::find($id);
+        if($product)
+        {
+            return response()->json([
+                'status'=>200,
+                'product'=> $product,
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'status'=>404,
+                'message'=>'No product Found.'
+            ]);
+        }
+    }
+
     // delete the product in specific the ID row
     public function destroy($id){
         $product = Product::find($id);
