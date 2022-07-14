@@ -67,6 +67,46 @@ class ProductController extends Controller
         }
     }
 
+    // update product Detail's
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'name'=>'required',
+            'price'=>'required',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json([
+                'status'=>400,
+                'errors'=>$validator->messages()
+            ]);
+        }
+        else
+        {
+            $product = Product::find($id);
+            if($product)
+            {
+                $product->name = $request->name;
+                $product->description = $request->description;
+                $product->price = $request->price;
+                $product->quantity = $request->quantity;
+                $product->update();
+                return response()->json([
+                    'status'=>200,
+                    'message'=>'product Updated Successfully.'
+                ]);
+            }
+            else
+            {
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'No product Found.'
+                ]);
+            }
+        }
+    }
+
     // delete the product in specific the ID row
     public function destroy($id){
         $product = Product::find($id);

@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="card">
+    <div id="success_message"></div>
     <div class="card-body">
         <h4 class="card-title">
             <div class="d-flex justify-content-between">
@@ -83,7 +84,7 @@
         </div>
         <div class="modal-body">
             {{-- showing message/response --}}
-            <ul class="list-unstyled" id="save_msgList"></ul>
+            <ul class="list-unstyled" id="update_msgList"></ul>
             {{-- productName --}}
           <div class="mb-3">
             <label for="" class="form-label">Name</label>
@@ -109,7 +110,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="edit_product">Add</button>
+          <button type="button" class="btn btn-primary update_product" id="update_product">Update</button>
         </div>
       </div>
     </div>
@@ -215,7 +216,7 @@
             $(document).on('click', '.editbtn', function (e) {
                 e.preventDefault();
                 var product_id = $('.editbtn').val();
-                $('#editProductModal').modal('show');
+                $('#EditProductModal').modal('show');
                 $.ajax({
                     type: "GET",
                     url: "/products/" + product_id,
@@ -223,9 +224,9 @@
                         if (response.status == 404) {
                             $('#success_message').addClass('alert alert-success');
                             $('#success_message').text(response.message);
-                            $('#editProductModal').modal('hide');
+                            $('#EditProductModal').modal('hide');
                         } else {
-                            console.log(response.product);
+                            // console.log(response.product);
                             $('#editProductName').val(response.product.name);
                             $('#editProductDescription').val(response.product.description);
                             $('#editProductPrice').val(response.product.price);
@@ -237,6 +238,47 @@
                 $('.btn-close').find('input').val('');
             })
             
+            // now time to update the product
+            $(document).on('click', '.update_product', function (e) {
+                e.preventDefault();
+
+                $(this).text('Updating...');
+                var id = $('#product_id').val();
+                
+                var data = {
+                    'description' : $('#editProductDescription').val(),
+                    'name' : $('#editProductName').val(),
+                    'price' : $('#editProductPrice').val(),
+                    'quantity' : $('#editProductQuantity').val(),
+                }
+                // console.log(data);
+                $.ajax({
+                    type: "PUT",
+                    url: "/products/" + id,
+                    data: data,
+                    dataType: "json",
+                    success: function (response) {
+                        // console.log(response);
+                        if (response.status == 400) {
+                            $('#update_msgList').html("");
+                            $('#update_msgList').addClass('alert alert-danger');
+                            $.each(response.errors, function (key, err_value) {
+                                $('#update_msgList').append('<li>' + err_value + '</li>');
+                            });
+                            $('.update_product').text('Failed to Update!');
+                        } else {
+                            $('#update_msgList').html("");
+                            $('#success_message').addClass('alert alert-success');
+                            $('#success_message').text(response.message);
+                            $('#EditProductModal').find('input').val('');
+                            $('.update_product').text('Update');
+                            $('#EditProductModal').modal('hide');
+                            // after update product, recall/fetching the all updated product
+                            getAllProduct();
+                        }
+                    }
+                });
+            });
 
             // delete a specific Product
             $(document).on('click', '.deletebtn', function (e) {
@@ -249,7 +291,6 @@
 
             $(document).on('click', '.delete_product', function (e) {
                 e.preventDefault();
-
                 $(this).text('Deleting...');
                 var id = $('#deleteing_product').val();
 
